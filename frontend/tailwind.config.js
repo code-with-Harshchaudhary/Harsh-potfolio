@@ -13,7 +13,7 @@ export default {
           darker: '#E5DED4',
         },
         fg: {
-          DEFAULT: '#2D2D2D',
+          DEFAULT: '#0a7a6d',
           dim: 'rgba(45,45,45,0.25)',
           dimmer: 'rgba(45,45,45,0.08)',
         },

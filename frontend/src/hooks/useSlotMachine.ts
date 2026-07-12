@@ -1,15 +1,9 @@
 import { useState, useCallback, useRef } from 'react';
 
 const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-const NAMES = { left: 'YOUR', right: 'NAME' };
-
-interface SlotState {
-  name: string;
-  isAnimating: boolean;
-}
 
 export function useSlotMachine() {
-  const [currentName, setCurrentName] = useState(NAMES.left);
+  const [currentName, setCurrentName] = useState('Harsh');
   const [isAnimating, setIsAnimating] = useState(false);
   const animatingRef = useRef(false);
 
@@ -39,11 +33,30 @@ export function useSlotMachine() {
     return w || 60;
   }, []);
 
+  /** Populate the display on first mount without animation */
+  const initName = useCallback((name: string) => {
+    const display = document.getElementById('nameDisplay');
+    if (!display || display.children.length > 0) return;
+    setCurrentName(name);
+    name.split('').forEach((ch) => {
+      const slot = document.createElement('div');
+      slot.className = 'name-slot';
+      slot.style.width = 'auto';
+      const reel = document.createElement('div');
+      reel.className = 'name-reel';
+      const span = document.createElement('span');
+      span.className = 'name-char';
+      span.textContent = ch;
+      reel.appendChild(span);
+      slot.appendChild(reel);
+      display.appendChild(slot);
+    });
+  }, []);
+
   const animateNameChange = useCallback((newName: string) => {
     if (animatingRef.current || currentName === newName) return;
     animatingRef.current = true;
     setIsAnimating(true);
-    setCurrentName(newName);
 
     const display = document.getElementById('nameDisplay');
     if (!display) { animatingRef.current = false; setIsAnimating(false); return; }
@@ -51,7 +64,6 @@ export function useSlotMachine() {
     const existing = display.querySelectorAll('.name-slot');
     const oldLen = existing.length;
 
-    // Remove excess slots
     if (oldLen > newName.length) {
       for (let i = newName.length; i < oldLen; i++) {
         const s = existing[i] as HTMLElement;
@@ -75,7 +87,6 @@ export function useSlotMachine() {
         }, i * 70 + Math.random() * 35);
       }
 
-      // Create reel
       const oldReel = slot.querySelector('.name-reel');
       if (oldReel) oldReel.remove();
       const reel = document.createElement('div');
@@ -109,11 +120,12 @@ export function useSlotMachine() {
           if (i === newName.length - 1) {
             animatingRef.current = false;
             setIsAnimating(false);
+            setCurrentName(newName);          // <-- ONLY update React state here
           }
         }, dur + 15);
       }, i * 70 + Math.random() * 35);
     });
   }, [currentName, getCharWidth, getCharHeight]);
 
-  return { currentName, isAnimating, animateNameChange };
+  return { currentName, isAnimating, animateNameChange, initName };
 }

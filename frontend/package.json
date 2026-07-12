@@ -10,9 +10,11 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "gasp": "^0.0.2",
+    "gsap": "^3.15.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "class-variance-authority": "^0.7.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",

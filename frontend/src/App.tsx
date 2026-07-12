@@ -22,8 +22,6 @@ function App() {
     setBootPending(false);
     setIsRevealed(true);
 
-    // Defer DOM manipulation to allow React to mount HeroSection first.
-    // Without this, getElementById returns null because HeroSection hasn't rendered yet.
     requestAnimationFrame(() => requestAnimationFrame(() => {
       const pSection = document.getElementById('portraitSection');
       const nSection = document.getElementById('nameSection');
@@ -134,10 +132,21 @@ function App() {
       <Navbar />
 
       <main id="mainContent">
-        <h1 className="sr-only">Your Name — Designer & Portfolio</h1>
+        <h1 className="sr-only">Harsh Chaudhary — Designer & Portfolio</h1>
         {!bootPending && <HeroSection isHeroVisible={isHeroVisible} setSide={setSide} side={side} />}
         <ProjectsSection />
         <ArtworksSection />
+        
+        {/* About Me Section */}
+        <section id="about" className="page-section">
+          <div className="section-content">
+            <h2 className="section-title">About Me</h2>
+            <p style={{ fontFamily: 'var(--font-ui)', fontSize: '1.1rem', lineHeight: 1.7, color: 'var(--fg)', maxWidth: '800px' }}>
+              {/* Add your bio here */}
+            </p>
+          </div>
+        </section>
+
         <ContactSection />
       </main>
 

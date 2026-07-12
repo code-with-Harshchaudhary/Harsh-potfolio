@@ -7,28 +7,27 @@ interface Props {
 }
 
 export default function SlotMachineName({ side, isHeroVisible }: Props) {
-  const { currentName, animateNameChange } = useSlotMachine();
+  const { animateNameChange, initName } = useSlotMachine();
   const prevSideRef = useRef<string>('left');
+  const initialized = useRef(false);
 
   useEffect(() => {
+    if (!initialized.current) {
+      initialized.current = true;
+      initName(side === 'left' ? 'Harsh' : 'Chaudhary');
+      return;
+    }
+
     if (!isHeroVisible) return;
     if (side !== prevSideRef.current && side !== 'center') {
-      animateNameChange(side === 'left' ? 'YOUR' : 'NAME');
+      animateNameChange(side === 'left' ? 'Harsh' : 'Chaudhary');
       prevSideRef.current = side;
     }
-  }, [side, isHeroVisible, animateNameChange]);
+  }, [side, isHeroVisible, animateNameChange, initName]);
 
   return (
-    <div className="name-section" id="nameSection" aria-label="Your Name">
-      <div className="name-display" id="nameDisplay">
-        {currentName.split('').map((ch, i) => (
-          <div key={`${currentName}-${i}`} className="name-slot" style={{ width: 'auto' }}>
-            <div className="name-reel">
-              <span className="name-char">{ch}</span>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="name-section" id="nameSection" aria-label="">
+      <div className="name-display" id="nameDisplay" />
     </div>
   );
 }

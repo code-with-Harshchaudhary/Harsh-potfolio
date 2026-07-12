@@ -4,31 +4,40 @@ interface Props {
   isHeroVisible: boolean;
 }
 
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// TUNE THESE 3 VALUES until sketch aligns with photo
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+const SKETCH_SCALE = .85;    // Bigger = sketch person larger (try 1.1 — 1.4)
+const SKETCH_OFFSET_X = 6;    // Positive = move sketch right (try -30 to +30)
+const SKETCH_OFFSET_Y = 130;   // Positive = move sketch down (try -20 to +60)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 export default function Portrait(_: Props) {
   const frameRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sketchImgRef = useRef<HTMLImageElement | null>(null);
+  const baseImgRef = useRef<HTMLImageElement | null>(null);
   const [sketchLoaded, setSketchLoaded] = useState(false);
+  const [baseLoaded, setBaseLoaded] = useState(false);
 
-  // Preload sketch image for canvas masking
   useEffect(() => {
-    const img = new Image();
-    img.src = '/images/sketch.png';
-    img.onload = () => {
-      sketchImgRef.current = img;
-      setSketchLoaded(true);
+    const base = new Image();
+    base.src = '/images/new_pot.png';
+    base.onload = () => {
+      baseImgRef.current = base;
+      setBaseLoaded(true);
     };
-    img.onerror = () => {
-      console.error('[Portrait] Failed to load sketch.png');
+
+    const sketch = new Image();
+    sketch.src = '/images/sketch.png';
+    sketch.onload = () => {
+      sketchImgRef.current = sketch;
+      setSketchLoaded(true);
     };
   }, []);
 
-  // Canvas loop: draws sketch masked by fluid canvas.
-  // Uses destination-in compositing — the fluid canvas alpha IS the mask.
-  // Where fluid is present → sketch shows. Where no fluid → transparent.
-  // No pixel sampling needed; the compositing handles it naturally.
   useEffect(() => {
-    if (!sketchLoaded || !sketchImgRef.current) return;
+    if (!sketchLoaded || !baseLoaded || !sketchImgRef.current || !baseImgRef.current) return;
 
     const canvas = canvasRef.current;
     const frame = frameRef.current;
@@ -36,6 +45,8 @@ export default function Portrait(_: Props) {
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    const photoAR = baseImgRef.current.naturalWidth / baseImgRef.current.naturalHeight;
 
     let raf: number;
     const loop = () => {
@@ -59,25 +70,38 @@ export default function Portrait(_: Props) {
         return;
       }
 
-      const img = sketchImgRef.current!;
-      const imgAR = img.naturalWidth / img.naturalHeight;
+      // Step 1: Calculate where the PHOTO sits (contain + bottom center)
+      let photoW: number, photoH: number, photoX: number, photoY: number;
       const canAR = cw / ch;
-      let dw: number, dh: number, dx: number, dy: number;
 
-      if (imgAR > canAR) {
-        dw = cw; dh = cw / imgAR;
-        dx = 0; dy = ch - dh;
+      if (photoAR > canAR) {
+        photoW = cw;
+        photoH = cw / photoAR;
+        photoX = 0;
+        photoY = ch - photoH;
       } else {
-        dh = ch; dw = ch * imgAR;
-        dx = (cw - dw) / 2; dy = 0;
+        photoH = ch;
+        photoW = ch * photoAR;
+        photoX = (cw - photoW) / 2;
+        photoY = 0;
       }
+
+      // Step 2: Draw sketch INSIDE the photo's bounding box,
+      // but scaled up and offset to align the subject
+      const sketchDrawW = photoW * SKETCH_SCALE;
+      const sketchDrawH = photoH * SKETCH_SCALE;
+      const sketchDrawX = photoX + (photoW - sketchDrawW) / 2 + SKETCH_OFFSET_X;
+      const sketchDrawY = photoY + (photoH - sketchDrawH) / 2 + SKETCH_OFFSET_Y;
 
       ctx.clearRect(0, 0, cw, ch);
 
-      // Draw sketch, then mask with fluid using destination-in.
-      // The fluid canvas alpha naturally reveals the sketch where
-      // fluid is present and keeps it transparent elsewhere.
-      ctx.drawImage(img, dx, dy, dw, dh);
+      // Draw sketch at adjusted position/scale
+      ctx.drawImage(
+        sketchImgRef.current!,
+        sketchDrawX, sketchDrawY, sketchDrawW, sketchDrawH
+      );
+
+      // Mask with fluid
       ctx.globalCompositeOperation = 'destination-in';
       ctx.drawImage(
         fluidCanvas,
@@ -90,7 +114,7 @@ export default function Portrait(_: Props) {
     };
     raf = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(raf);
-  }, [sketchLoaded]);
+  }, [sketchLoaded, baseLoaded]);
 
   return (
     <div className="portrait-section" id="portraitSection">
@@ -102,14 +126,6 @@ export default function Portrait(_: Props) {
           alt="Portrait photo"
           draggable={false}
           fetchPriority="high"
-        />
-        <img
-          className="portrait-illustration"
-          id="portraitIllustration"
-          src="/images/sketch.png"
-          alt="Sketch illustration"
-          draggable={false}
-          style={{ visibility: 'hidden' }}
         />
         <canvas
           className="illustration-canvas"

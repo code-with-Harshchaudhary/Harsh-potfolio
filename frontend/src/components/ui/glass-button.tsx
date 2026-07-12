@@ -28,7 +28,7 @@ const glassButtonTextVariants = cva(
     variants: {
       size: {
         default: "px-6 py-3.5",
-        sm: "px-4 py-2",
+        sm: "px-8 py-4",
         lg: "px-8 py-4",
         icon: "flex h-10 w-10 items-center justify-center",
       },

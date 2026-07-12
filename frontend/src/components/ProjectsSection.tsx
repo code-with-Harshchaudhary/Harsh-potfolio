@@ -1,29 +1,43 @@
-const PROJECTS = [
-  { name: 'Brand Identity', category: 'Visual Design', gradient: 'from-[#e8e0d4] via-[#d4c8b8] to-[#c4b8a8]' },
-  { name: 'Web Design', category: 'UX/UI', gradient: 'from-[#d4c8b8] via-[#c4b8a8] to-[#b8a898]' },
-  { name: 'Mobile App', category: 'Interface Design', gradient: 'from-[#c4b8a8] via-[#b8a898] to-[#a89888]' },
-  { name: 'Illustration', category: 'Digital Art', gradient: 'from-[#b8a898] via-[#a89888] to-[#988878]' },
+import { useEffect, useRef } from 'react';
+import { StackedCards } from '@/components/ui/glass-cards';
+
+const PROJECT_CARDS = [
+  { id: 1, title: 'Project 1', description: 'A groundbreaking digital experience', color: 'rgba(0, 229, 255, 0.8)' },
+  { id: 2, title: 'Project 2', description: 'Innovative design solutions', color: 'rgba(255, 45, 45, 0.8)' },
+  { id: 3, title: 'Project 3', description: 'Creative brand identity system', color: 'rgba(255, 210, 0, 0.8)' },
+  { id: 4, title: 'Project 4', description: 'Next-generation web application', color: 'rgba(0, 255, 136, 0.8)' },
+  { id: 5, title: 'Project 5', description: 'Immersive user interface', color: 'rgba(180, 100, 255, 0.8)' },
+  { id: 6, title: 'Project 6', description: 'Advanced prototyping system', color: 'rgba(255, 140, 0, 0.8)' },
 ];
 
 export default function ProjectsSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    // Force the section to be visible since .page-section starts at opacity: 0
+    const section = sectionRef.current;
+    if (section) {
+      section.classList.add('is-visible');
+    }
+  }, []);
+
   return (
-    <section id="projects" className="page-section page-projects">
-      <div className="section-content">
-        <h2 className="section-title">PROJECTS</h2>
-        <div className="projects-grid">
-          {PROJECTS.map((project, i) => (
-            <article className="project-card" key={i}>
-              <div className="project-image-wrap">
-                <div className={`project-image-placeholder bg-gradient-to-br ${project.gradient}`}>
-                  <span className="project-placeholder-text">Project {i + 1}</span>
-                </div>
-              </div>
-              <div className="project-info">
-                <h3 className="project-name">{project.name}</h3>
-                <p className="project-category">{project.category}</p>
-              </div>
-            </article>
-          ))}
+    <section
+      ref={sectionRef}
+      id="projects"
+      className="page-section page-projects"
+      style={{ minHeight: 'auto', padding: 0 }}
+    >
+      {/* Dark scrollable area for glass cards */}
+      <div style={{ background: '#0a0a0a', padding: '100px 60px 80px' }}>
+        <div className="section-content">
+          <h2
+            className="section-title"
+            style={{ color: '#ffffff', marginBottom: '60px' }}
+          >
+            PROJECTS
+          </h2>
+          <StackedCards cards={PROJECT_CARDS} />
         </div>
       </div>
     </section>

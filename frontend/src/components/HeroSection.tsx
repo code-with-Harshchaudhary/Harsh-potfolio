@@ -5,7 +5,6 @@ import TopographicBg from './TopographicBg';
 import Portrait from './Portrait';
 import SlotMachineName from './SlotMachineName';
 import SideLabels from './SideLabels';
-import { GlassButton } from '@/components/ui/glass-button';
 
 interface Props {
   isHeroVisible: boolean;
@@ -18,7 +17,7 @@ export default function HeroSection({ isHeroVisible, setSide, side }: Props) {
   const smoothParaName = useRef(0);
   const rawY = useRef(0.5);
   const rafRef = useRef(0);
-  const idleTimer = useRef<ReturnType<typeof setTimeout>>();
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const isIdle = useRef(true);
   const idleT = useRef(0);
   const idleFluidTimer = useRef(0);
@@ -116,6 +115,12 @@ export default function HeroSection({ isHeroVisible, setSide, side }: Props) {
   return (
     <section className="hero-section" id="hero">
       <div className="bg-layer" aria-hidden="true">
+        {/* Animated glass blobs */}
+        <div className="glass-blob blob-1" />
+        <div className="glass-blob blob-2" />
+        <div className="glass-blob blob-3" />
+        <div className="glass-blob blob-4" />
+        <div className="glass-blob blob-5" />
         <TopographicBg isHeroVisible={isHeroVisible} />
         <FluidCanvas isHeroVisible={isHeroVisible} />
         <div className="bg-noise" />
@@ -130,4 +135,3 @@ export default function HeroSection({ isHeroVisible, setSide, side }: Props) {
     </section>
   );
 }
-

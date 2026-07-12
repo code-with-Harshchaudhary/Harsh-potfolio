@@ -1,57 +1,38 @@
 import { useEffect, useState } from 'react';
-import { GlassButton } from '@/components/ui/glass-button';
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [label, setLabel] = useState('YOUR NAME');
 
   useEffect(() => {
     const onScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > window.innerHeight * 0.85);
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      const half = window.innerWidth / 2;
-      setLabel(e.clientX < half ? 'Harsh chaudhary': 'PORTFOLIO');
-    };
-    document.addEventListener('mousemove', onMouseMove, { passive: true });
-    return () => document.removeEventListener('mousemove', onMouseMove);
-  }, []);
-
   const scrollTo = (id: string) => {
     const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
-    <nav className={`site-nav ${isScrolled ? 'is-scrolled' : ''}`} aria-label="Site navigation">
-      <div className="nav-left">
-        <span className="nav-left-text" id="navIndexLabel">{label}</span>
+    <nav className={`site-nav ${isScrolled ? 'is-scrolled' : ''}`}>
+      <div className="nav-links" style={{ flex: 1, justifyContent: 'flex-start' }}>
+        <a className="nav-link" onClick={() => scrollTo('projects')}>Projects</a>
+        <a className="nav-link" onClick={() => scrollTo('artworks')}>Artworks</a>
       </div>
-      <div className="nav-links">
-        <GlassButton
-          size="sm"
-          onClick={() => scrollTo('projects')}
-        >
-          Projects
-        </GlassButton>
-        <GlassButton
-          size="sm"
-          onClick={() => scrollTo('artworks')}
-        >
-          Artworks
-        </GlassButton>
-        <GlassButton
-          size="sm"
-          onClick={() => scrollTo('contact')}
-        >
-          Contact
-        </GlassButton>
+
+      <div className="nav-center">
+        <span className="nav-center-text" onClick={() => scrollTo('hero')}>
+          Harsh Chaudhary
+        </span>
+      </div>
+
+      <div className="nav-links" style={{ flex: 1 }}>
+        <a className="nav-link" onClick={() => scrollTo('contact')}>Contact</a>
+        <a className="nav-link" onClick={() => scrollTo('about')}>About Me</a>
       </div>
     </nav>
   );

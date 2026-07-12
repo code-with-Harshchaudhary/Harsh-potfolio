@@ -542,8 +542,8 @@ export function useFluidSim(canvasRef: React.RefObject<HTMLCanvasElement | null>
 
     // Set bg config
     (window as unknown as Record<string, unknown>).BgConfig = {
-      GRAY_R: 30, GRAY_G: 25, GRAY_B: 90,
-      EDGE_LOW: 0.01, EDGE_HIGH: 0.09,
+      GRAY_R: 90, GRAY_G: 10, GRAY_B: 15,
+      EDGE_LOW: 0.01, EDGE_HIGH: 0.9,
     };
 
     const update = () => {
